@@ -1,0 +1,2 @@
+state ,next state ,next engine bits
+localparam
