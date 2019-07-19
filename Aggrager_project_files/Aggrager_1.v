@@ -42,8 +42,8 @@ module Aggregator #(
 //---------------------------------------------------------------------------------------------------------------------
 // parameter definitions
 //---------------------------------------------------------------------------------------------------------------------
-	parameter 		DATA_WIDTH		=	12'h0FF,
-	parameter 		LENGTH_WIDTH	=	8'h1F
+	parameter 		DATA_WIDTH		=	12'h0FF, //255
+	parameter 		LENGTH_WIDTH	=	8'h1F    //31
 )(	
 	clk,
 	reset,
@@ -66,8 +66,8 @@ module Aggregator #(
 	input								clk			;
 	input								reset 		;
 	input								start 		;
-	input			[DATA_WIDTH-1:0]	DATA_IN1	;
-	input			[DATA_WIDTH-1:0]	DATA_IN2	;
+	input			[DATA_WIDTH:0]		DATA_IN1	;
+	input			[DATA_WIDTH:0]		DATA_IN2	;
 	input 								ready 		;
 	output	reg							ready_1 	;
 	output	reg							ready_2 	;
@@ -184,7 +184,7 @@ module Aggregator #(
 	    end else begin
 	        case(state)
 
-		    	READY1,READY2	:	begin
+		    	READY1,READY2	:	begin											//SENDING THE READY SIGNALS
 			   							case(next_engine)
 			   								ENGINE1	:	begin
 			   												ready_1<=1'b1;
@@ -195,7 +195,7 @@ module Aggregator #(
 			   							endcase
 			   						end
 
-		    	GET_DATA1,GET_DATA1	:begin
+		    	GET_DATA1,GET_DATA1	:begin											//
 			   							case(next_engine)
 			   								ENGINE1	:	begin
 			   												DATA<=DATA_IN1;
@@ -212,7 +212,9 @@ module Aggregator #(
                                         ROW 	<=	(LENGTH >> 3);
 			   						end
 
-			   	CHECK_ROW		:	ROW_NUM	<=	ROW +1'b1;
+			   	CHECK_ROW		:	ROW_NUM	<=	ROW +1'b1;							//NO OF ROWS FOR THE LENGTH
+			   						//FULL_ROW_LENGTH <= (ROW<<3);
+			   						//DATA_REMAIN<=LENGTH -
 
 			   	OUTPUT 			:	begin
 			   							if (ready) begin
@@ -259,7 +261,7 @@ module Aggregator #(
         count_done = 1'b0;
         case(state) 
         NEXT_DATA	:count_done = (count == ROW_NUM);
-        READY1 		:count_done = (count == ROW_NUM);
+        WAIT 		:count_done = (count == ROW_NUM);
         
        
       
